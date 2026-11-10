@@ -1,0 +1,658 @@
+/* Kindstart styles.
+   Every colour is a variable on :root, defined for light mode, dark mode and the evening.
+   The rest of the file only uses var(--name), so switching modes just swaps the values.
+   Every size is in rem (1rem = the root text size), and the root text size follows the
+   screen width, so the whole layout grows and shrinks together. */
+
+:root {
+  /* Warm, dull orange palette. Every colour keeps its blue part low (less blue light),
+     and every text/background pair passes WCAG AA contrast (4.5:1 or more). */
+  --bg: #f5ede3;
+  --surface: #fbf6ef;
+  --text: #3b2a1e;
+  --muted: #6b5444;
+  --line: #e4d4c1;
+  --accent: #a3542a;
+  --accent-text: #fff8f0;
+  --accent-soft: #f0dcc6;
+  --warm-soft: #f4e1c1;
+  --crisis: #a23a2a;
+  --crisis-text: #fff8f0;
+  --crisis-soft: #f5dad1;
+  --shadow: 0 1px 3px rgb(59 42 30 / 0.1);
+  --radius: 0.75rem;
+  --tabs: 4rem;
+  color-scheme: light;
+}
+
+/* Dark: the device asks for it. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1410;
+    --surface: #261c16;
+    --text: #f0e0cc;
+    --muted: #bfa58c;
+    --line: #3b2c22;
+    --accent: #e3995e;
+    --accent-text: #24140a;
+    --accent-soft: #3d2618;
+    --warm-soft: #33261a;
+    --crisis: #f08f7a;
+    --crisis-text: #2a0f0a;
+    --crisis-soft: #3e211b;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+
+/* Evening: the same dark colours from an hour before bedtime until wake-up (sleep.js adds
+   the class), whatever the device says. Darker and warmer = less blue light at night. */
+:root.evening {
+  --bg: #1b1410;
+  --surface: #261c16;
+  --text: #f0e0cc;
+  --muted: #bfa58c;
+  --line: #3b2c22;
+  --accent: #e3995e;
+  --accent-text: #24140a;
+  --accent-soft: #3d2618;
+  --warm-soft: #33261a;
+  --crisis: #f08f7a;
+  --crisis-text: #2a0f0a;
+  --crisis-soft: #3e211b;
+  --shadow: none;
+  color-scheme: dark;
+}
+
+/* ---------- Size: follows the screen ---------- */
+
+/* 18px text on phones, growing with the window up to 22px on big screens.
+   clamp(smallest, preferred, largest); vw = 1% of the window's width. */
+html {
+  font-size: clamp(18px, 16px + 0.45vw, 22px);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Low screens (a phone turned sideways): a slimmer bar so there's room for content. */
+@media (max-height: 500px) {
+  :root { --tabs: 3.25rem; }
+  .tabs span { display: none; }
+}
+
+/* ---------- Basics ---------- */
+
+* { box-sizing: border-box; }
+
+/* The hidden attribute must always win. Without this, a rule like `.more-menu { display: grid }`
+   shows an element that HTML says is hidden. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 1rem/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 3.25rem 1rem calc(var(--tabs) + 6rem);
+}
+
+h1 { font-size: 1.5rem; margin: 0 0 1rem; }
+h2 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+h3 { font-size: 1rem; margin: 0 0 0.25rem; }
+a { color: var(--accent); }
+button { font: inherit; color: inherit; cursor: pointer; }
+.muted { color: var(--muted); }
+.small { font-size: 0.85rem; }
+.lead { font-size: 1.1rem; margin: 0 0 0.75rem; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Read by screen readers, not shown. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Icons: thin lines in the text colour. */
+.icon { display: inline-flex; flex-shrink: 0; }
+.icon svg, .tabs svg, .more-menu svg, .fab svg {
+  width: 1.25em;
+  height: 1.25em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- SOS: crisis lines, one tap away on every page ---------- */
+
+.sos {
+  position: fixed;
+  top: calc(0.6rem + env(safe-area-inset-top));
+  right: calc(0.75rem + env(safe-area-inset-right));
+  z-index: 35;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--crisis);
+  color: var(--crisis-text);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- The bottom bar and ⋯ ---------- */
+
+.tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--tabs) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  z-index: 30;
+}
+
+.tabs button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.tabs svg { width: 1.5rem; height: 1.5rem; }
+.tabs button[aria-current="page"] { color: var(--accent); font-weight: 700; }
+
+.more-menu {
+  position: fixed;
+  right: 0.5rem;
+  bottom: calc(var(--tabs) + env(safe-area-inset-bottom) + 0.5rem);
+  z-index: 31;
+  display: grid;
+  min-width: 11rem;
+  padding: 0.4rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.18);
+}
+
+.more-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  text-align: left;
+}
+
+.more-menu button:hover { background: var(--accent-soft); }
+
+/* ---------- Pages ---------- */
+
+.page-title { font-size: 1.4rem; }
+
+.content-error {
+  margin: 0;
+  padding: 0.75rem 5.5rem 0.75rem 1rem;
+  background: var(--crisis-soft);
+  border-bottom: 2px solid var(--crisis);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--text);
+}
+
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+.btn.danger { background: var(--crisis); border-color: var(--crisis); color: var(--crisis-text); font-weight: 600; }
+.btn.quiet { background: none; border-color: transparent; color: var(--muted); }
+.btn.small { min-height: 2.25rem; padding: 0.25rem 0.9rem; font-size: 0.9rem; }
+.btn.big { min-height: 3.25rem; padding: 0.5rem 1.6rem; font-size: 1.1rem; }
+.btn.round { width: 3.25rem; min-height: 3.25rem; padding: 0; }
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.75rem; }
+
+/* The round + on Today, above the bottom bar. */
+.fab {
+  position: fixed;
+  right: calc(1rem + env(safe-area-inset-right));
+  bottom: calc(var(--tabs) + env(safe-area-inset-bottom) + 1rem);
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 4px 14px rgb(59 42 30 / 0.3);
+}
+
+.fab svg { width: 1.6rem; height: 1.6rem; stroke-width: 2.5; }
+
+/* ---------- Cards ---------- */
+
+.card {
+  margin: 0.75rem 0;
+  padding: 0.9rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.card > :first-child { margin-top: 0; }
+.card p { margin: 0 0 0.5rem; }
+.card p:last-child { margin-bottom: 0; }
+
+.card-kind {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The source link always sits in the bottom-right corner of a card. */
+.card-foot { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+.card-foot .source { margin-left: auto; font-size: 0.8rem; color: var(--muted); }
+
+.realization { background: var(--warm-soft); border-color: transparent; }
+
+.welcome h2 { margin: 0; font-size: 1.6rem; color: var(--accent); }
+.welcome .slogan { margin: 0.25rem 0 0; font-size: 1.1rem; font-weight: 600; }
+
+.tag-sample {
+  margin-left: 0.4rem;
+  padding: 0 0.25rem;
+  border: 1px dashed var(--muted);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  vertical-align: middle;
+}
+
+/* ---------- Folds: only the title shows until it's tapped ---------- */
+
+details.fold {
+  margin: 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+details.fold > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  padding: 0.4rem 0;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary::after { content: "+"; font-size: 1.3rem; color: var(--muted); }
+details.fold[open] > summary::after { content: "−"; }
+details.fold[open] { padding-bottom: 0.75rem; }
+
+/* ---------- Today ---------- */
+
+.today-top { display: grid; gap: 0.25rem; margin-bottom: 0.5rem; }
+.clock { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem; margin: 0; }
+.clock-time { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.top-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  text-align: left;
+}
+
+.top-link span:last-child { overflow-wrap: anywhere; }
+.top-link.pill {
+  justify-self: start;
+  padding: 0.2rem 0.9rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The timeline: a calm line with one dot per task. */
+.timeline { position: relative; list-style: none; margin: 1rem 0; padding: 0 0 0 1.5rem; }
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.4rem;
+  width: 2px;
+  background: var(--line);
+}
+
+.timeline > li { position: relative; margin: 0 0 0.75rem; }
+
+.timeline .more button { border: 0; background: none; padding: 0 0 0 0.25rem; color: var(--muted); min-height: 2.25rem; font-weight: 600; }
+
+.task-row { display: flex; align-items: flex-start; gap: 0.5rem; }
+
+/* The circle that marks a task done. It sits on the line. */
+.tick {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin: 0.15rem 0 0 -1.9rem;
+  padding: 0;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--accent-text);
+}
+
+.tick:hover, .tick.ready { background: var(--accent-soft); }
+.task.done .tick { background: var(--accent); }
+.tick .icon svg { width: 1rem; height: 1rem; stroke-width: 3; }
+
+.task-open {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+  padding: 0.1rem 0;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+.task-title { font-weight: 600; overflow-wrap: anywhere; }
+.task-next { font-size: 0.9rem; color: var(--muted); overflow-wrap: anywhere; }
+.task-when { padding-top: 0.15rem; font-size: 0.9rem; white-space: nowrap; color: var(--muted); }
+.task.overdue .task-when { color: var(--crisis); }
+.task.done .task-title { text-decoration: line-through; color: var(--muted); }
+.task.top-goal .task-title::after { content: " ★"; color: var(--accent); }
+.task-more { padding: 0.25rem 0 0.5rem; }
+
+/* A task's steps: tick boxes. The next one to do is in full colour, the rest are quieter. */
+.steps { list-style: none; margin: 0.25rem 0 0.4rem; padding: 0; }
+.step label { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.15rem 0; font-size: 0.95rem; color: var(--muted); cursor: pointer; }
+.step input { flex-shrink: 0; width: 1.15rem; height: 1.15rem; margin: 0.2rem 0 0; accent-color: var(--accent); }
+.step span { overflow-wrap: anywhere; }
+.step.next label { color: var(--text); font-weight: 600; }
+.step.done span { text-decoration: line-through; }
+.step-add { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.step-add input { flex: 1; min-width: 0; }
+
+.wins-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.wins-list { margin: 0.25rem 0 0; color: var(--muted); }
+
+/* ---------- Forms ---------- */
+
+.field { display: flex; flex-direction: column; gap: 0.25rem; margin: 0 0 0.75rem; }
+.field > span { font-size: 0.9rem; color: var(--muted); }
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+}
+
+textarea { min-height: 5.5rem; resize: vertical; }
+
+.row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.row > .field { flex: 1 1 8rem; }
+
+.choices { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+
+.choice {
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.choice[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.choice.quiet { border-style: dashed; color: var(--muted); }
+
+.task-form input[type="date"] { margin: 0 0 0.75rem; }
+.step-count { margin: 0; font-size: 0.85rem; color: var(--muted); }
+
+/* Extra steps in the add-task form: the field, with × to remove it on its right. */
+.step-field { display: flex; align-items: center; gap: 0.25rem; margin: 0 0 0.5rem; }
+.step-field .field { flex: 1; margin: 0; }
+
+/* 24-hour time picker: [hour] : [minutes] */
+.time-pick { display: flex; align-items: center; gap: 0.4rem; }
+.time-pick select { width: auto; min-width: 4.75rem; }
+
+/* A setting: a few words on the left, its choices on the right. */
+.setting { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin: 0.5rem 0; }
+.setting .choices { margin: 0; }
+
+/* ---------- Calendar ---------- */
+
+.cal-head { display: flex; align-items: center; justify-content: space-between; }
+.cal-head h2 { margin: 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; margin: 0.5rem 0 1rem; }
+.cal-weekday { text-align: center; font-size: 0.8rem; color: var(--muted); }
+
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.1rem;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0.3rem 0 0;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: var(--surface);
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-day.is-today { border-color: var(--accent); font-weight: 700; }
+.cal-day[aria-pressed="true"] { background: var(--accent-soft); }
+.cal-marks { display: flex; align-items: center; gap: 0.15rem; color: var(--accent); }
+.cal-marks .dot { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--accent); }
+.cal-marks .icon svg { width: 0.8rem; height: 0.8rem; }
+
+.day-panel h3 { margin-bottom: 0.5rem; }
+.day-list { display: grid; gap: 0.25rem; }
+.day-list .done { text-decoration: line-through; color: var(--muted); }
+.date-row { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.25rem; padding: 0; border: 0; background: none; color: var(--text); text-align: left; }
+.date-row .icon { color: var(--accent); }
+
+/* ---------- Focus ---------- */
+
+#page-focus .page-body { text-align: center; }
+.phase { margin: 0; font-weight: 700; color: var(--accent); letter-spacing: 0.05em; text-transform: uppercase; }
+.big-time { margin: 0.25rem 0; font-size: 4.5rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.round-dots { margin: 0 0 1rem; color: var(--accent); letter-spacing: 0.2em; }
+.focus-task { display: grid; gap: 0.1rem; margin: 0 auto 1rem; max-width: 24rem; }
+.focus-controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.75rem; }
+#page-focus details.fold { text-align: left; margin-top: 2rem; }
+
+/* ---------- Goals ---------- */
+
+.goal-list { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 0.5rem; }
+.goal { background: var(--surface); border: 1px solid var(--line); border-left-width: 5px; border-radius: var(--radius); }
+.goal.p1 { border-left-color: var(--accent); }
+.goal.p2 { border-left-color: var(--warm-soft); }
+.goal.p3 { border-left-color: var(--line); }
+.goal-row { display: flex; align-items: center; gap: 0.75rem; width: 100%; min-height: 3rem; padding: 0.5rem 0.75rem; border: 0; background: none; text-align: left; }
+.goal-text { flex: 1; overflow-wrap: anywhere; font-weight: 600; }
+.prio { flex-shrink: 0; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.goal.p1 .prio { color: var(--accent); font-weight: 700; }
+.goal-options { padding: 0 0.75rem 0.75rem; }
+.goal-card { border-left: 5px solid var(--accent); }
+
+/* ---------- Help, About you, Crisis ---------- */
+
+.problem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.5rem; }
+.problem-grid .choice { border-radius: var(--radius); text-align: left; }
+
+.statement-text { font-size: 1.2rem; margin: 0.75rem 0 1rem; }
+.scale { display: grid; gap: 0.5rem; }
+.scale .choice { border-radius: var(--radius); text-align: left; }
+
+.contact { border-left: 4px solid var(--crisis); }
+.contact .how { margin: 0.25rem 0; font-size: 1.15rem; font-weight: 700; }
+
+/* ---------- Notes ---------- */
+
+.note { display: flex; gap: 0.5rem; align-items: flex-start; }
+.note p { flex: 1; white-space: pre-wrap; overflow-wrap: anywhere; }
+.list-plain { margin: 0; padding-left: 1.25rem; }
+
+/* ---------- Reminder banners at the top of the screen ---------- */
+
+.toasts {
+  position: fixed;
+  top: calc(3.25rem + env(safe-area-inset-top));
+  left: 0.5rem;
+  right: 0.5rem;
+  z-index: 40;
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+  pointer-events: none; /* clicks pass through the empty space around the banners */
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: min(30rem, 100%);
+  padding: 0.5rem 0.25rem 0.5rem 1rem;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.18);
+}
+
+.toast-text { flex: 1; display: grid; gap: 0.1rem; padding-top: 0.35rem; overflow-wrap: anywhere; }
+.toast-text span { font-size: 0.9rem; color: var(--muted); }
+
+/* ---------- The "No AI inside" plaque at the bottom of every page ---------- */
+
+.plaque {
+  max-width: 18rem;
+  margin: 3rem auto 0;
+  padding: 0.4rem 0.9rem;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  outline: 1px solid var(--accent); /* a second, thin frame around the first */
+  outline-offset: 3px;
+  text-align: center;
+}
+
+.plaque summary {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  cursor: pointer;
+  list-style: none;
+}
+
+.plaque summary::-webkit-details-marker { display: none; }
+.plaque p { margin: 0.4rem 0 0.2rem; font-size: 0.8rem; color: var(--muted); }
+
+/* ---------- Touch screens: bigger targets for fingers ---------- */
+
+/* pointer: coarse = the main input is a finger (phones, tablets), not a mouse. */
+@media (pointer: coarse) {
+  .btn, .choice, input[type="text"], input[type="email"], input[type="password"], input[type="date"], select {
+    min-height: 3rem;
+  }
+  .btn.small { min-height: 2.75rem; }
+  .icon-btn { width: 3rem; height: 3rem; }
+  .top-link, .wins-toggle, .timeline .more button { min-height: 2.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}
