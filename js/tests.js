@@ -2,7 +2,7 @@
 
 import { toISODate, fromISODate, addDays, daysBetween, friendlyDate, isNight, joinTime, toMinutes, shiftTime,
   minutesUntil, lastTimeOf, isBetweenTimes, monthGrid, nextOccurrence, occursOn, daysWord } from "./dates.js";
-import { makeTask, isOverdue, orderTasks, timelineView, finishTask, postponeTask, lengthLabel,
+import { makeTask, isOverdue, orderTasks, timelineView, finishTask, reopenTask, postponeTask, lengthLabel,
   upgradeTask, toggleStep, addStep, nextStepIndex } from "./tasks.js";
 import { topProblems } from "./questionnaire.js";
 import { normalize, checkContent, mergeContent } from "./content-check.js";
@@ -71,6 +71,7 @@ check("timelineView shows 4", view.shown.length, 4);
 check("timelineView hides the rest", view.hidden.map((task) => task.id), ["anytime", "future"]);
 check("timelineView counts done today", view.doneToday, 1);
 check("finishTask marks the day", finishTask(tasks[0], today).doneDate, today);
+check("reopenTask brings a done task back", reopenTask(finishTask(tasks[0], today)), tasks[0]);
 check("postponeTask moves to tomorrow", postponeTask(tasks[4], today).date, "2026-11-05");
 check("postponeTask counts", postponeTask(postponeTask(tasks[4], today), today).postponed, 2);
 check("lengthLabel 10", lengthLabel(10), "10 min");

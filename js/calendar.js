@@ -4,7 +4,7 @@
 import { state, save, newId } from "./store.js";
 import { toISODate, fromISODate, monthGrid, occursOn, friendlyDate, FULL_MONTHS, DAY_NAMES } from "./dates.js";
 import { DAYS_BEFORE } from "./notifications.js";
-import { openAddTask } from "./timeline.js";
+import { openAddTask, undoButton } from "./timeline.js";
 import { el, button, choices, select, pageBody, iconButton, icon } from "./ui.js";
 
 let shown = null; // { year, month } on screen
@@ -73,7 +73,15 @@ function dayPanel(day, today) {
   const list = el("ul", "list-plain day-list");
   for (const entry of state.dates.filter((d) => occursOn(d.date, d.yearly, day))) list.append(dateItem(entry));
   for (const task of state.tasks.filter((t) => t.date === day)) {
-    list.append(el("li", task.done ? "done" : "", task.time ? `${task.time} ${task.title}` : task.title));
+    const text = task.time ? `${task.time} ${task.title}` : task.title;
+    if (!task.done) {
+      list.append(el("li", "", text));
+      continue;
+    }
+    // A done task can come back from here too, on any day.
+    const item = el("li", "with-undo");
+    item.append(el("span", "done", text), undoButton(task, drawCalendar));
+    list.append(item);
   }
   if (list.children.length > 0) panel.append(list);
 

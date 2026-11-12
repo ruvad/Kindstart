@@ -5,7 +5,7 @@
 import { state, save } from "./store.js";
 import { content } from "./content-check.js";
 import { toISODate, friendlyDate, isNight, addDays, nextOccurrence, daysBetween, daysWord, pad } from "./dates.js";
-import { timelineView, isOverdue, finishTask, postponeTask, toggleStep, addStep, nextStepIndex, lengthLabel } from "./tasks.js";
+import { timelineView, isOverdue, finishTask, reopenTask, postponeTask, toggleStep, addStep, nextStepIndex, lengthLabel } from "./tasks.js";
 import { priorityMap, topGoal } from "./goal-list.js";
 import { RealizationCard } from "./realization.js";
 import { openTaskForm } from "./task-form.js";
@@ -170,10 +170,10 @@ function taskItem(task, today, priorities) {
   const next = task.steps[nextStepIndex(task)];
 
   const row = el("div", "task-row");
-  const tick = button("", "tick", () => markDone(task.id));
-  tick.setAttribute("aria-label", `Done: ${task.title}`);
+  // The circle marks a task done; tapped again right after, it brings the task back.
+  const tick = button("", "tick", () => (task.justDone ? undoDone(task.id) : markDone(task.id)));
+  tick.setAttribute("aria-label", task.justDone ? `Not done: ${task.title}` : `Done: ${task.title}`);
   if (task.justDone) {
-    tick.disabled = true;
     tick.append(icon("check"));
   } else if (task.steps.length > 0 && !next) {
     tick.classList.add("ready"); // every step ticked
@@ -189,7 +189,8 @@ function taskItem(task, today, priorities) {
 
   row.append(tick, toggle);
   const when = whenLabel(task, today, overdue);
-  if (when) row.append(el("span", "task-when", when));
+  if (task.justDone) row.append(undoButton(task)); // a mis-tap is fixed right here
+  else if (when) row.append(el("span", "task-when", when));
   item.append(row);
   if (open) item.append(taskMore(task));
 
@@ -291,11 +292,30 @@ function winsLine(today) {
   if (winsOpen) {
     const list = el("ul", "list-plain wins-list");
     for (const task of [...week].sort((a, b) => b.doneDate.localeCompare(a.doneDate))) {
-      list.append(el("li", "", `${task.title} · ${friendlyDate(task.doneDate, today)}`));
+      const item = el("li", "with-undo");
+      item.append(el("span", "", `${task.title} · ${friendlyDate(task.doneDate, today)}`), undoButton(task));
+      list.append(item);
     }
     box.append(list);
   }
   return box;
+}
+
+// "Undo": brings a done task back onto the timeline. Also used in the calendar.
+export function undoButton(task, after = () => {}) {
+  const undo = button("Undo", "undo", () => {
+    undoDone(task.id);
+    after();
+  });
+  undo.setAttribute("aria-label", `Not done: ${task.title}`);
+  return undo;
+}
+
+export function undoDone(id) {
+  state.tasks = state.tasks.map((task) => (task.id === id ? reopenTask(task) : task));
+  save();
+  if (flash?.taskId === id) flash = null; // the "done" card goes too
+  renderTimeline();
 }
 
 // ---------- Cards for missed / done / later ----------

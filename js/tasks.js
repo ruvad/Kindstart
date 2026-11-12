@@ -92,6 +92,11 @@ export function finishTask(task, today) {
   return { ...task, done: true, doneDate: today };
 }
 
+// Brings a done task back: a mis-tap, or it wasn't really finished. Its steps stay as they were.
+export function reopenTask(task) {
+  return { ...task, done: false, doneDate: "" };
+}
+
 // Later = tomorrow.
 export function postponeTask(task, today) {
   return { ...task, date: addDays(today, 1), postponed: task.postponed + 1 };
