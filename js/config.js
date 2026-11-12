@@ -1,4 +1,4 @@
-// Accounts are OFF until both lines below are filled in. Setup steps: docs/ACCOUNTS.md.
+// Accounts are OFF until both lines below are filled in. The database: docs/supabase-setup.sql.
 //
 // Both values are safe to publish: the publishable key is made for web pages, and the
 // Row Level Security rules on the table decide what each person can read.

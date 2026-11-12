@@ -95,13 +95,16 @@ export function startReminders() {
 // ---------- Showing one ----------
 
 // Shows the reminder inside the app, and as a system notification when allowed.
-export async function notify(title, body, tag) {
-  showBanner(title, body);
+// banner: false = no banner in the app (the focus timer has its own full-screen alert).
+// sticky: true = the system notification stays until it's closed, and phones vibrate.
+export async function notify(title, body, tag, { banner = true, sticky = false } = {}) {
+  if (banner) showBanner(title, body);
   if (permission() !== "granted") return "banner";
+  const options = sticky ? { body, tag, requireInteraction: true, renotify: true, vibrate: [200, 100, 200] } : { body, tag };
   try {
     const registration = await navigator.serviceWorker?.getRegistration();
-    if (registration) await registration.showNotification(title, { body, tag });
-    else new Notification(title, { body, tag });
+    if (registration) await registration.showNotification(title, options);
+    else new Notification(title, options);
     return "system";
   } catch {
     return "banner"; // e.g. a browser that refuses notifications from a page

@@ -10,7 +10,7 @@
 //    and a comma after it. The last one may keep its comma too.
 //  - Text goes between "double quotes". To use a " inside the text, write \"
 //  - id: short, unique, lowercase-with-dashes. Never reuse one.
-//  - sample: true marks an entry Claude wrote as a placeholder (it shows a SAMPLE tag).
+//  - sample: true marks a placeholder entry (it shows a SAMPLE tag).
 //    Delete that line when the entry is yours.
 //  - source: a link starting with https:// (optional). It appears in the card's
 //    bottom-right corner.
@@ -311,7 +311,7 @@ export const tips = [
 
 // Contacts. kind "crisis" shows on the Crisis page (SOS); kind "professional" under Help → Talk to someone.
 // call / text: the number to call or text (optional). link: the website (optional).
-// Claude checked these against the official sites on 2026-11-05. Check again before changing a number.
+// Checked against the official sites on 2026-11-05. Check again before changing a number.
 export const contacts = [
   {
     id: "emergency",

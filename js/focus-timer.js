@@ -30,7 +30,18 @@ export function phaseMinutes(phase, settings, taskMinutes = null) {
 // Sets a phase up without starting it.
 export function prepareTimer(minutes, meta) {
   stopTicking();
-  timer = { ...meta, left: minutes * 60_000, endsAt: null, running: false };
+  timer = { ...meta, total: minutes * 60_000, left: minutes * 60_000, endsAt: null, running: false };
+}
+
+// Changes the length of the part that's on now, without stopping it: the time already
+// done is kept. Made shorter than what's already done, it ends at the next second.
+export function changeLength(minutes) {
+  if (!timer) return;
+  const done = timer.total - timeLeft();
+  timer.total = minutes * 60_000;
+  const left = Math.max(0, timer.total - done);
+  if (timer.running) timer.endsAt = Date.now() + left;
+  else timer.left = left;
 }
 
 export function startTimer(minutes, meta) {

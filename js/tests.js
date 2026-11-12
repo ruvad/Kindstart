@@ -9,7 +9,7 @@ import { normalize, checkContent, mergeContent } from "./content-check.js";
 import { pickRealization, fillText, RealizationCard } from "./realization.js";
 import * as realContent from "../content/content.js";
 import * as extraContent from "../content/extra.js";
-import { formatRemaining, nextPhase, phaseMinutes } from "./focus-timer.js";
+import { formatRemaining, nextPhase, phaseMinutes, prepareTimer, changeLength, currentTimer, timeLeft, resetTimer } from "./focus-timer.js";
 import { dueTaskReminders, dueDateReminders, dueSleepReminders, reminderText } from "./notifications.js";
 import { sessionFrom, errorMessage, isSecretKey, tokensFromLink, mergeStates } from "./account.js";
 import { sortGoals, topGoal, priorityMap, priorityLabel } from "./goal-list.js";
@@ -112,6 +112,13 @@ check("phaseMinutes: a focus round", phaseMinutes("work", pomodoro), 25);
 check("phaseMinutes: a 10-minute task gets a 10-minute round", phaseMinutes("work", pomodoro, 10), 10);
 check("phaseMinutes: a long task still gets 25", phaseMinutes("work", pomodoro, 90), 25);
 check("phaseMinutes: breaks", [phaseMinutes("short", pomodoro), phaseMinutes("long", pomodoro)], [5, 15]);
+prepareTimer(25, { phase: "work", round: 1 });
+currentTimer().left = 20 * 60_000; // 5 minutes done
+changeLength(30);
+check("changeLength: longer keeps the time done (30 - 5 = 25 min left)", timeLeft(), 25 * 60_000);
+changeLength(4);
+check("changeLength: shorter than the time done ends it (0 left)", timeLeft(), 0);
+resetTimer();
 
 // ---------- dates.js: times of day and the calendar ----------
 check("toMinutes", toMinutes("07:30"), 450);

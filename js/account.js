@@ -1,5 +1,5 @@
 // Accounts with Supabase: create an account, sign in, sign out, and keep the person's data
-// in their account so it's the same on every device. Setup and the database rules: docs/ACCOUNTS.md.
+// in their account so it's the same on every device. The database rules: docs/supabase-setup.sql.
 //
 // It talks to Supabase's REST API with fetch, without a library, so every request is visible here.
 // Accounts are off until js/config.js has the project URL and the publishable key.

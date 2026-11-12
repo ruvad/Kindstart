@@ -30,12 +30,8 @@ Everything people read lives in [`content/content.js`](content/content.js) and [
 
 ## Accounts
 
-Optional, with Supabase, and off until set up: [docs/ACCOUNTS.md](docs/ACCOUNTS.md).
-
-## Research
-
-How Kindstart compares with nine other apps: [docs/COMPETITORS.md](docs/COMPETITORS.md).
+Optional, with Supabase, and off until set up: run [`docs/supabase-setup.sql`](docs/supabase-setup.sql) in a Supabase project, then put its URL and publishable key in [`js/config.js`](js/config.js).
 
 ## How it's built
 
-A school project. Plain HTML, CSS and JavaScript, no build step. The code was written with Claude, an AI model; the app itself runs on plain rules and sends nothing to an AI.
+A school project. Plain HTML, CSS and JavaScript, no build step. The app runs on plain rules and sends nothing to an AI.

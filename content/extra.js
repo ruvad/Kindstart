@@ -1,6 +1,6 @@
 // =====================================================================================
-//  Kindstart content, part 2: more SAMPLE entries (placeholders written by Claude on
-//  2026-11-07), to be rewritten. Same format as content.js (its header explains it).
+//  Kindstart content, part 2: more SAMPLE entries (placeholders from 2026-11-07),
+//  to be rewritten. Same format as content.js (its header explains it).
 //
 //  The app reads BOTH files and joins their lists: problems, aboutQuestions,
 //  taskQuestions, realizations, tips and contacts. scale and selfCheck stay in content.js.
